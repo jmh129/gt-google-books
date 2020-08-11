@@ -1,45 +1,41 @@
+const express = require("express");
 const db = require("../models/books");
-const axios = require("axios");
+const router = express.Router();
 
-// Defining methods for the booksController
-module.exports = {
-  findAll: function (req, res) {
-    db.Book.find(req.query)
-      .sort({ date: -1 })
-      .then((dbModel) => res.json(dbModel))
-      .catch((err) => res.status(422).json(err));
-  },
-  searchGoogle: function (req, res) {
-    const query = req.body;
-    console.log(query);
-    axios
-      .get(`https://www.googleapis.com/books/v1/volumes?q=${query}`)
-      .then((data) => {
-        res.json(data);
-      })
-      .catch((err) => {
-        console.log(err);
+router.get('/'), (req, res) => {
+  db.Book.find({})
+  .then(bookData => {
+      res.status(200).json({
+          error: false,
+          data: bookData,
+          message: 'Successfully retrieved saved books.'
       });
-  },
-  findById: function (req, res) {
-    db.Book.findById(req.params.id)
-      .then((dbModel) => res.json(dbModel))
-      .catch((err) => res.status(422).json(err));
-  },
-  create: function (req, res) {
-    db.Book.create(req.body)
-      .then((dbModel) => res.json(dbModel))
-      .catch((err) => res.status(422).json(err));
-  },
-  update: function (req, res) {
-    db.Book.findOneAndUpdate({ _id: req.params.id }, req.body)
-      .then((dbModel) => res.json(dbModel))
-      .catch((err) => res.status(422).json(err));
-  },
-  remove: function (req, res) {
-    db.Book.findById({ _id: req.params.id })
-      .then((dbModel) => dbModel.remove())
-      .then((dbModel) => res.json(dbModel))
-      .catch((err) => res.status(422).json(err));
-  },
+  })
+  .catch(err => {
+      res.status(500).json({
+          error: true,
+          data: err,
+          message: 'Unable to retrieve saved books.'
+      })
+  });
 };
+
+router.post('/', (req,res) => {
+  db.Book.create(req.body)
+  .then(bookData => {
+      res.status(200).json({
+          error: false,
+          data: bookData,
+          message: 'Successfully saved book to collection.'
+      });
+  })
+  .catch(err => {
+      res.status(500).json({
+          error: true,
+          data: err,
+          message: 'Unable to save book to collection.'
+      })
+  });
+});
+
+module.exports = router;
