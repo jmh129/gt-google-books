@@ -26,6 +26,7 @@
     "mongoose": "^5.9.28",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-router-dom": "^5.2.0",
     "reactstrap": "^8.5.1"
   }
 }
